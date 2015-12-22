@@ -4,11 +4,7 @@
 
 package com.sourceclear.gramtest;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  *
@@ -22,9 +18,9 @@ public class GeneratorVisitor extends bnfBaseVisitor {
   //////////////////////////////// Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   
   private final Map<String,bnfParser.RhsContext> productionsMap = new HashMap<>();
-  private int maxNum = 100;
+  private int maxNum = 1;
   private int maxDepth = 2;
-  private boolean useMinimalGenerator = true;
+  private boolean useMinimalGenerator = false;
   private List<String> tests = new LinkedList<>();
   private final Stack<String> prodHist = new Stack<>();
           
@@ -78,15 +74,15 @@ public class GeneratorVisitor extends bnfBaseVisitor {
 
   @Override
   public List<String> visitElement(bnfParser.ElementContext ctx) {
-    List<String> result = new LinkedList<>();
+    List<String> result = new ArrayList<>();
     if(ctx.zeroormore() != null) {
       result = visitAlternatives(ctx.zeroormore().alternatives()); // one time
       result.add(""); // zero time
     }
     else if(ctx.oneormore() != null) {
       result = visitAlternatives(ctx.oneormore().alternatives()); // one time
-      List<String> twoLs = combineTwoLists(result,result); //two times
-      result.addAll(twoLs);
+   //   List<String> twoLs = combineTwoLists(result,result); //two times
+   //   result.addAll(twoLs);
     }
     else if(ctx.optional() != null) {
       //currently similar to zero of more times
@@ -104,6 +100,8 @@ public class GeneratorVisitor extends bnfBaseVisitor {
       prodHist.push(lhs);
       return visitRhs(productionsMap.get(lhs));
     }
+
+    Collections.shuffle(result);
     return result;
   }
 
@@ -215,6 +213,11 @@ public class GeneratorVisitor extends bnfBaseVisitor {
   
   public List<String> getTests() {
     return tests;
+  }
+
+  public void printTests() {
+    for(String s : tests)
+      System.out.println(s.replace("_n", "\r\n"));
   }
   
 }

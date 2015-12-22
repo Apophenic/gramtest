@@ -1,25 +1,33 @@
-# Grammar based test case generation
-This tool allows you to generate test cases based on arbitrary user defined grammars. The input grammar is given in BNF notation. Potential applications include fuzzing and automated testing.
+Branch of [Gramtest](https://github.com/codelion/gramtest)
 
-## Instructions
-We use maven as our build tool. When you compile the project using maven it will generate a single Jar, that can be run from the command line as follows:
+# Purpose
+Gramtest uses ANTLR to parse E/BNF grammar files, then generate test cases that correspond to the supplied grammar.
+The problem is that it takes a recursive approach and will generate every possible combination of grammars in order.
+Using the ``mingen`` flag allows for some randomization, but it generally falls on its face.
 
-`java -jar gramtest.jar -file grammar.bnf`
+TLDR; If you need to generate randomized BNF grammar test cases, you'll be wanting this project.
 
-To take a look at all the additional options, you can run `java -jar gramtest.jar -h` which will print the details as below.
+# Differences
+* Removes "bug" where using grammar to pick one and only one alternative would result in more than one option being
+picked anyway
+* Shuffles grammar test cases as the grammar is parsed. This ensures a randomized result (NOTE: -mingen must be false)
+* Adds a printTests() method in extractor
+* Adds support for parsing newline characters ("_n" in your grammar file)
+* Default options are now maxNum = 1, depth = 2, mingen = false
 
-```
-usage: gramtest [options]
- -dep <depth of rules>         maximum depth for recursive rules
- -ext <extension>              file extension for generated tests
- -file <grammar file>          path to the grammar file (in BNF notation)
- -h,--help                     prints this message
- -mingen <minimal generator>   use minimal sentence generation
-                               (true/false)
- -num <number of tests>        maximum number of test cases
- -tests <test folder>          path to the folder to store generated tests
-```
-## Articles
+# Additional Usage
+You can compile this branch to a jar and use it the same way as gramtest, or add the project as a dependency and do
+the following:
 
-- [How does grammar-based test case generation work?](https://blog.srcclr.com/how-does-grammar-based-test-case-generation-work/)
-- [Practical tips for implementing grammar-based test case generation](https://blog.srcclr.com/practical-tips-for-implementing-grammar-based-test-case-generation/)
+~~~ java
+          Lexer lexer = new bnfLexer(new ANTLRFileStream(filename));
+          CommonTokenStream tokens = new CommonTokenStream(lexer);
+          bnfParser grammarparser = new bnfParser(tokens);
+          //grammarparser.setTrace(true);
+          ParserRuleContext tree = grammarparser.rulelist();
+          GeneratorVisitor extractor = new GeneratorVisitor(max,depth,useMinGen);
+          extractor.visit(tree);
+~~~
+
+Calling ``extractor.visit()`` will generate the appropriate test cases. They can be accessed using the getter, or the
+ print method I've added (printTests()).
