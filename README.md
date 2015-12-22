@@ -23,7 +23,6 @@ the following:
           Lexer lexer = new bnfLexer(new ANTLRFileStream(filename));
           CommonTokenStream tokens = new CommonTokenStream(lexer);
           bnfParser grammarparser = new bnfParser(tokens);
-          //grammarparser.setTrace(true);
           ParserRuleContext tree = grammarparser.rulelist();
           GeneratorVisitor extractor = new GeneratorVisitor(max,depth,useMinGen);
           extractor.visit(tree);
