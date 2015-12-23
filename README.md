@@ -22,9 +22,9 @@ the following:
 ~~~ java
           Lexer lexer = new bnfLexer(new ANTLRFileStream(filename));
           CommonTokenStream tokens = new CommonTokenStream(lexer);
-          bnfParser grammarparser = new bnfParser(tokens);
+          bnfParser grammarParser = new bnfParser(tokens);
           ParserRuleContext tree = grammarparser.rulelist();
-          GeneratorVisitor extractor = new GeneratorVisitor(max,depth,useMinGen);
+          GeneratorVisitor extractor = new GeneratorVisitor(max, depth, useMinGen);
           extractor.visit(tree);
 ~~~
 

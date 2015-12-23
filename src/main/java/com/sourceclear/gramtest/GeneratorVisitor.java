@@ -21,7 +21,7 @@ public class GeneratorVisitor extends bnfBaseVisitor {
   private int maxNum = 1;
   private int maxDepth = 2;
   private boolean useMinimalGenerator = false;
-  private List<String> tests = new LinkedList<>();
+  private List<String> tests = new ArrayList<>();
   private final Stack<String> prodHist = new Stack<>();
           
   /////////////////////////////// Constructors \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -107,20 +107,20 @@ public class GeneratorVisitor extends bnfBaseVisitor {
 
   @Override
   public List<String> visitAlternative(bnfParser.AlternativeContext ctx) {
-    List<List<String>> comStr = new LinkedList<>();
+    List<List<String>> comStr = new ArrayList<>();
     for(bnfParser.ElementContext ec1 : ctx.element()) {
       List<String> slist = visitElement(ec1);
-      if(slist.isEmpty()) return new LinkedList<>();
+      if(slist.isEmpty()) return new ArrayList<>();
       else comStr.add(slist);
     }
-    List<String> emptyStr = new LinkedList<>();
+    List<String> emptyStr = new ArrayList<>();
     emptyStr.add("");
     return generateAllStrings(comStr, emptyStr);
   }
 
   @Override
   public List<String> visitAlternatives(bnfParser.AlternativesContext ctx) {
-    List<String> altStrs = new LinkedList<>();
+    List<String> altStrs = new ArrayList<>();
     for(bnfParser.AlternativeContext ac : ctx.alternative()) {
       if(prodHist.size() < maxDepth)
         altStrs.addAll(visitAlternative(ac));
@@ -147,7 +147,7 @@ public class GeneratorVisitor extends bnfBaseVisitor {
 
   @Override
   public Object visitRulelist(bnfParser.RulelistContext ctx) {
-    List<String> sentences = new LinkedList();
+    List<String> sentences = new ArrayList();
     for(bnfParser.Rule_Context rc : ctx.rule_()) {
       productionsMap.put(rc.lhs().id().getText(), rc.rhs());
     }
@@ -186,7 +186,7 @@ public class GeneratorVisitor extends bnfBaseVisitor {
   }
   
   private List<String> combineTwoLists(List<String> preList, List<String> postList) {
-    List<String> combList = new LinkedList<>();
+    List<String> combList = new ArrayList<>();
     
     if(useMinimalGenerator) {
       Stack<String> preStack = new Stack<>();
